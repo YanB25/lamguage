@@ -139,7 +139,7 @@ class Tokenizer():
     
     @staticmethod
     def keywords():
-        return ['if', 'else', 'function']
+        return ['if', 'else', 'function', 'then', 'true', 'false']
 
 if __name__ == '__main__':
     f = open('input', 'r')

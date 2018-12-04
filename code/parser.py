@@ -13,7 +13,7 @@ class Parser():
     def parse(self):
         self.programs = []
         while not self.tokenizer.eof():
-            self.programs.append(self.parse_program())
+            self.programs.append(self.parse_expression())
             if not self.tokenizer.eof():
                 self.skip_punc(';')
         return {
@@ -98,18 +98,46 @@ class Parser():
             if (self.is_punc('(')):
                 # an atom starts with '(', must be expression
                 ch = self.tokenizer.next()
-                assert(Tokenizer.is_punc(ch))
+                assert(Tokenizer.is_punc(ch.value))
                 exp = self.parse_expression() # GREEDY
                 self.skip_punc(')')
                 return exp
             if (self.is_punc('{')):
                 return self.parse_program()
+            if (self.is_kw('if')):
+                return self.parse_if()
+            if (self.is_kw('true') or self.is_kw('false')):
+                return self.parse_bool()
+            if (self.is_kw('function')):
+                return self.parse_function()
             # TODO:
             tok = self.tokenizer.next()
             if (tok.type == 'identity' or tok.type == 'number' or tok.type == 'string'):
                 return tok
             self.tokenizer.error('{} (type is {}) not expected. only expect var, num and str.'.format(tok.value, tok.type))
         return self.maybe_call(wrapper)
+
+    def parse_if(self):
+        self.skip_kw('if')
+        cond = self.parse_expression()
+        if not self.is_punc('{'):
+            self.skip_kw('then')
+        then = self.parse_expression()
+        ret = {
+            'type': 'if',
+            'cond': cond,
+            'then': then,
+        }
+        if self.is_kw('else'):
+            self.skip_kw('else')
+            else_statement = self.parse_expression()
+            ret['else'] = else_statement
+        return ret
+    def parse_bool(self):
+        return {
+            'type': 'bool',
+            'value': self.tokenizer.next()
+        }
 
     @staticmethod
     def precedence(op):
@@ -124,11 +152,20 @@ class Parser():
 
     def skip_punc(self, ch):
         tok = self.tokenizer.peek()
-        assert(tok.type == 'punc')
-        assert(tok.value == ch)
+        if tok.type != 'punc' or tok.value != ch:
+            self.tokenizer.error('{} not valid. expect {}(punc)'.format(tok.value, ch))
         eat_tok = self.tokenizer.next()
         assert(eat_tok.type == 'punc')
         assert(eat_tok.value == ch)
+
+    def skip_kw(self, kw):
+        tok = self.tokenizer.peek()
+        if tok.type != 'keyword' or tok.value != kw:
+            self.tokenizer.error('{} not valid. expect {}(keyword)'.format(tok.value, kw))
+
+        eat_tok = self.tokenizer.next()
+        assert(eat_tok.type == 'keyword')
+        assert(eat_tok.value == kw)
 
     def is_punc(self, ch = None):
         tok = self.tokenizer.peek()
@@ -136,11 +173,15 @@ class Parser():
     def is_op(self, op = None):
         tok = self.tokenizer.peek()
         return tok is not None and tok.type == 'op' and (op is None or tok.value == op)
-        
     
+    def is_kw(self, kw = None):
+        tok = self.tokenizer.peek()
+        return tok is not None and tok.type == 'keyword' and (kw is None or tok.value == kw)
+        
+import sys
 if __name__ == '__main__':
     pp = pprint.PrettyPrinter(indent=2)
-    f = open('input2', 'r')
+    f = open(sys.argv[1], 'r')
     s = f.read()
     parser = Parser(Tokenizer(InputStream(s)))
     pp.pprint(parser.parse())
