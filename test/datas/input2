@@ -1,0 +1,13 @@
+{
+    abc(jja, b, c) + 4;
+    ab(a, e) + 2 * 1;
+    i = 2;
+    if a == 2 {
+        b = 2;
+    } else if a == 7 {
+        c = 3;
+        k = k;
+    } else {
+        b = 3;
+    };
+}
