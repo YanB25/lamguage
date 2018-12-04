@@ -1,6 +1,6 @@
 import pprint
 from inputStream import InputStream
-from token import Tokenizer
+from tokenizer import Tokenizer
 FALSE = {
     'type': 'bool',
     'value': 'false'
@@ -112,6 +112,8 @@ class Parser():
                 return self.parse_function()
             # TODO:
             tok = self.tokenizer.next()
+            if (tok is None):
+                self.tokenizer.error('unexpected EOF')
             if (tok.type == 'identity' or tok.type == 'number' or tok.type == 'string'):
                 return tok
             self.tokenizer.error('{} (type is {}) not expected. only expect var, num and str.'.format(tok.value, tok.type))
@@ -138,6 +140,19 @@ class Parser():
             'type': 'bool',
             'value': self.tokenizer.next()
         }
+    
+    def parse_function(self):
+        self.skip_kw('function')
+        return {
+            'type': 'function',
+            'args': self.delimited('(', ')', ',', self.parse_val),
+            'body': self.parse_expression()
+        }
+    def parse_val(self):
+        tok = self.tokenizer.next()
+        if (tok.type != 'identity'):
+            self.tokenizer.error('expect identity, got {}({})'.format(tok.value, tok.type))
+        return tok.value
 
     @staticmethod
     def precedence(op):

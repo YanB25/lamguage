@@ -4,3 +4,5 @@ if a >= 3 {
     k = (a > 3);
     c = "sadfadsf";
 }
+# test lambda
+function (a) {a}
