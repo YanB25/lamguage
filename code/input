@@ -1,0 +1,6 @@
+# just a test
+if a >= 3 {
+    b = 2;
+    k = (a > 3);
+    c = "sadfadsf";
+}
