@@ -50,18 +50,39 @@ class Interpreter():
     def run(self):
         self.evaluate(self.ast, self.env)
     def evaluate(self, exp, env):
-        if exp.type == 'program':
+        typ = exp['type']
+        if typ == 'program':
             val = None
             for program in exp['progs']:
                 val = self.evaluate(program, env)
             return val
-        if exp['type'] == 'assign':
-            name = exp['left'].value
-            if exp['left'].type != 'identity':
+        if typ == 'assign':
+            name = exp['left']['value']
+            if exp['left']['type'] != 'identity':
                 raise Exception('left side of = should be identity. get {}'.format(name))
             return env.define(name, self.evaluate(exp['right'], env))
-        if exp['type'] in ['number', 'string', 'bool']:
+        if typ in ['number', 'string', 'bool']:
             return exp['value']
+        if typ == 'identity':
+            return env.getname(exp['value'])
+        if typ == 'function':
+            return self.make_function(exp, env)
+        if typ == 'call':
+            arg_lst = []
+            for arg in exp['args']:
+                arg_lst.append(self.evaluate(arg, env))
+            func = env.getname(exp['function']['value'])
+            func(*arg_lst)
+            return func
+        raise Exception('unknown type {}'.format(typ))
+    def make_function(self, exp, env):
+        def func():
+            names = exp['args']
+            scope = env.extend()
+            for name in names:
+                scope.define(name, env.getname(name))
+            return self.evaluate(exp['body'], scope)
+        return func
 
 
 
@@ -73,5 +94,6 @@ if __name__ == '__main__':
 
     parser = Parser(Tokenizer(InputStream(s)))
     env = Environment()
+    env.define('print', lambda x : print(x))
     interpreter = Interpreter(parser.parse(), env)
     interpreter.run()
