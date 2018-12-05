@@ -21,4 +21,4 @@ gcd = function(a, b) {
 print(f(4));
 print(f(5));
 print(fac(5));
-print(gcd(25, 10));
+print(gcd(25, 25));
