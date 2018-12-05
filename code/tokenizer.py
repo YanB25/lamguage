@@ -1,15 +1,15 @@
 from inputStream import InputStream
 typeList = ['op', 'punc', 'identity', 'number', 'keyword', 'string', 'bool']
 
-class Token():
-    def __init__(self, type_, value_):
-        self.type = type_
-        self.value = value_
-    def __repr__(self):
-        return str({
-            'type': self.type,
-            'value': self.value
-        })
+# class Token():
+#     def __init__(self, type_, value_):
+#         self.type = type_
+#         self.value = value_
+#     def __repr__(self):
+#         return str({
+#             'type': self.type,
+#             'value': self.value
+#         })
 
 class Tokenizer():
     def __init__(self, ipstr):
@@ -53,13 +53,18 @@ class Tokenizer():
         if (Tokenizer.is_identity_begin(ch)):
             return self.__read_identity()
         if (Tokenizer.is_punc(ch)):
-            return Token('punc', self.ipstr.next())
+            return {
+                'type': 'punc',
+                'value': self.ipstr.next()
+            }
         if (Tokenizer.is_op(ch)):
             return self.__read_op()
-            # return Token('op', self.ipstr.next())
         self.ipstr.error('Can not handle charactor: {}'.format(ch))
     def __read_op(self):
-        return Token('op', self.__read_while(Tokenizer.is_op))
+        return {
+            'type': 'op',
+            'value': self.__read_while(Tokenizer.is_op)
+        }
     def __read_until(self, predicate):
         ret = ''
         while not self.ipstr.eof() and not predicate(self.ipstr.peek()):
@@ -76,13 +81,22 @@ class Tokenizer():
     def __read_identity(self):
         idf = self.__read_while(Tokenizer.is_identity)
         if idf in Tokenizer.keywords():
-            return Token('keyword', idf)
+            return {
+                'type': 'keyword',
+                'value': idf
+            }
         else:
-            return Token('identity', idf)
+            return {
+                'type': 'identity',
+                'value': idf
+            }
 
     def __read_number(self):
         num = self.__read_while(Tokenizer.is_digit)
-        return Token('number', num)
+        return {
+            'type': 'number',
+            'value': num
+        }
     
     def __skip_comment(self):
         self.__read_until(Tokenizer.is_newline)
@@ -91,7 +105,11 @@ class Tokenizer():
         assert(self.ipstr.peek() == '"')
         self.ipstr.next()
         ret = self.__read_until(Tokenizer.is_double_quote)
-        return Token('string', ret[:-1])
+        # return Token('string', ret[:-1])
+        return {
+            'type': 'string',
+            'value': ret[:-1]
+        }
         
     @staticmethod
     def is_newline(ch):

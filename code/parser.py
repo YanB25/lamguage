@@ -76,12 +76,12 @@ class Parser():
         '''
         if (self.is_op()):
             tok = self.tokenizer.peek() # it must be an op
-            rhs_prec = Parser.precedence(tok.value)
+            rhs_prec = Parser.precedence(tok['value'])
             if rhs_prec > prec:
                 ch = self.tokenizer.next()
                 return self.maybe_binary({
-                    'type': 'assign' if tok.value == '=' else 'binary',
-                    'operator': tok.value,
+                    'type': 'assign' if tok['value'] == '=' else 'binary',
+                    'operator': tok['value'],
                     'left': left,
                     'right': self.maybe_binary(self.parse_atom(), rhs_prec) # here, it is GREEDY
                 }, prec) # and here, recursive goes back and become same "precedence level"
@@ -98,7 +98,7 @@ class Parser():
             if (self.is_punc('(')):
                 # an atom starts with '(', must be expression
                 ch = self.tokenizer.next()
-                assert(Tokenizer.is_punc(ch.value))
+                assert(Tokenizer.is_punc(ch['value']))
                 exp = self.parse_expression() # GREEDY
                 self.skip_punc(')')
                 return exp
@@ -114,9 +114,9 @@ class Parser():
             tok = self.tokenizer.next()
             if (tok is None):
                 self.tokenizer.error('unexpected EOF')
-            if (tok.type == 'identity' or tok.type == 'number' or tok.type == 'string'):
+            if (tok['type'] == 'identity' or tok['type'] == 'number' or tok['type'] == 'string'):
                 return tok
-            self.tokenizer.error('{} (type is {}) not expected. only expect var, num and str.'.format(tok.value, tok.type))
+            self.tokenizer.error('{} (type is {}) not expected. only expect var, num and str.'.format(tok['value'], tok['type']))
         return self.maybe_call(wrapper)
 
     def parse_if(self):
@@ -150,9 +150,9 @@ class Parser():
         }
     def parse_val(self):
         tok = self.tokenizer.next()
-        if (tok.type != 'identity'):
-            self.tokenizer.error('expect identity, got {}({})'.format(tok.value, tok.type))
-        return tok.value
+        if (tok['type'] != 'identity'):
+            self.tokenizer.error('expect identity, got {}({})'.format(tok['value'], tok['type']))
+        return tok['value']
 
     @staticmethod
     def precedence(op):
@@ -167,31 +167,31 @@ class Parser():
 
     def skip_punc(self, ch):
         tok = self.tokenizer.peek()
-        if tok.type != 'punc' or tok.value != ch:
-            self.tokenizer.error('{} not valid. expect {}(punc)'.format(tok.value, ch))
+        if tok['type'] != 'punc' or tok['value'] != ch:
+            self.tokenizer.error('{} not valid. expect {}(punc)'.format(tok['value'], ch))
         eat_tok = self.tokenizer.next()
-        assert(eat_tok.type == 'punc')
-        assert(eat_tok.value == ch)
+        assert(eat_tok['type'] == 'punc')
+        assert(eat_tok['value'] == ch)
 
     def skip_kw(self, kw):
         tok = self.tokenizer.peek()
-        if tok.type != 'keyword' or tok.value != kw:
-            self.tokenizer.error('{} not valid. expect {}(keyword)'.format(tok.value, kw))
+        if tok['type'] != 'keyword' or tok['value'] != kw:
+            self.tokenizer.error('{} not valid. expect {}(keyword)'.format(tok['value'], kw))
 
         eat_tok = self.tokenizer.next()
-        assert(eat_tok.type == 'keyword')
-        assert(eat_tok.value == kw)
+        assert(eat_tok['type'] == 'keyword')
+        assert(eat_tok['value'] == kw)
 
     def is_punc(self, ch = None):
         tok = self.tokenizer.peek()
-        return tok is not None and tok.type == 'punc' and (ch is None or tok.value == ch)
+        return tok is not None and tok['type'] == 'punc' and (ch is None or tok['value'] == ch)
     def is_op(self, op = None):
         tok = self.tokenizer.peek()
-        return tok is not None and tok.type == 'op' and (op is None or tok.value == op)
+        return tok is not None and tok['type'] == 'op' and (op is None or tok['value'] == op)
     
     def is_kw(self, kw = None):
         tok = self.tokenizer.peek()
-        return tok is not None and tok.type == 'keyword' and (kw is None or tok.value == kw)
+        return tok is not None and tok['type'] == 'keyword' and (kw is None or tok['value'] == kw)
         
 import sys
 if __name__ == '__main__':
