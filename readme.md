@@ -7,7 +7,7 @@ lamguage(lambda-language) is a toy language implemented by Python (for fun).
 This repo provide a python version.
 ## how to run
 ```
-// input file
+# input file
 f = function(i) {
     if i % 2 == 0 {1;}
     else {0;};
