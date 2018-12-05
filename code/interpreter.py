@@ -55,25 +55,23 @@ class Interpreter():
             for program in exp['progs']:
                 val = self.evaluate(program, env)
             return val
-        if exp.type == 'assign':
-            name = exp['left']['value']
-            if env['left']['type'] != 'identity':
+        if exp['type'] == 'assign':
+            name = exp['left'].value
+            if exp['left'].type != 'identity':
                 raise Exception('left side of = should be identity. get {}'.format(name))
             return env.define(name, self.evaluate(exp['right'], env))
-        if exp.type in ['number', 'string', 'bool']:
+        if exp['type'] in ['number', 'string', 'bool']:
             return exp['value']
 
 
 
 
 if __name__ == '__main__':
-    s1 = Environment()
-    s1.define('a', 5)
-    s2 = s1.extend()
-    s2.define('b', 6)
-    print(s2.getname('a'))
-    # s2.define('a', 8)
-    print(s2.getname('a'))
-    s2.setval('a', 100)
-    print(s2.getname('a'))
-    print(s1.getname('a'))
+    f = open('input3', 'r')
+    s = f.read().strip()
+    f.close()
+
+    parser = Parser(Tokenizer(InputStream(s)))
+    env = Environment()
+    interpreter = Interpreter(parser.parse(), env)
+    interpreter.run()
