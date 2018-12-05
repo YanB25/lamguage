@@ -1,14 +1,14 @@
 class InputStream():
     def __init__(self, stream):
         assert(type(stream) == str)
-        self.stream = stream
+        self.stream = stream.strip()
         self.pos = 0
         self.line = 1
         self.col = 0
         self.__current_line = ''
     def append(self, datas):
         assert(type(datas) == str)
-        self.stream += datas
+        self.stream += datas.strip()
     def next(self):
         ch = self.stream[self.pos]
         self.pos += 1

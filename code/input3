@@ -1,4 +1,2 @@
 a = 3;
 b = true;
-b = function (a) {a};
-b(3);
