@@ -1,3 +1,4 @@
+import math
 from parser import Parser
 from tokenizer import Tokenizer
 from inputStream import InputStream
@@ -69,6 +70,16 @@ class Interpreter():
             return env.getname(exp['value'])
         if typ == 'function':
             return self.make_function(exp, env)
+        if typ == 'binary':
+            return self.apply_op(exp['operator'], self.evaluate(exp['left'], env), self.evaluate(exp['right'], env))
+        if typ == 'if':
+            cond = self.evaluate(exp['cond'], env)
+            if (cond == 'True'):
+                return self.evaluate(exp['then'], env)
+            if (exp.get('else')):
+                return self.evaluate(exp['else'], env)
+            else:
+                return False
         if typ == 'call':
             arg_lst = []
             for arg in exp['args']:
@@ -87,11 +98,43 @@ class Interpreter():
             return self.evaluate(exp['body'], scope)
         return func
 
-
+    def apply_op(self, op, lhs, rhs):
+        def toBool(s):
+            if s not in ['True', 'False']:
+                raise Exception('compiler internal error. s is {} not in True, False'.format(s))
+            return True if s == 'True' else False
+        if (op == '+'):
+            return str(int(lhs) + int(rhs))
+        if (op == '-'):
+            return str(int(lhs) - int(rhs))
+        if (op == '*'):
+            return str(int(lhs) * int(rhs))
+        if (op == '/'):
+            return str(math.floor(int(lhs) / int (rhs)))
+        if (op == '%'):
+            return str(int(lhs) % int(rhs))
+        if (op == '&&'):
+            return str(toBool(lhs) and toBool(rhs))
+        if (op == '||'):
+            return str(toBool(lhs) or toBool(rhs))
+        if (op == '<'):
+            return str(int(lhs) < int(rhs))
+        if (op == '>'):
+            return str(int(lhs) > int(rhs))
+        if (op == '<='):
+            return str(int(lhs) <= int(rhs))
+        if (op == '>='):
+            return str(int(lhs) >= int(rhs))
+        if (op == '=='):
+            return (str(int(lhs) == int(rhs)))
+        if (op == '!='):
+            return (str(int(lhs) != int(rhs)))
+        raise Exception('can not recognise op {}'.format(op))
+        
 
 
 if __name__ == '__main__':
-    f = open('input3', 'r')
+    f = open('input-hard', 'r')
     s = f.read().strip()
     f.close()
 

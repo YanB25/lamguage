@@ -4,5 +4,25 @@ f = function (a) {
     a;
     a;
 };
-print(f(a));
-print(f(f(f(a, a))));
+add = function(a, b) {a + b;};
+mul = function(a, b) { a - b};
+# print(f(a));
+# print(f(f(f(a))));
+# print(add(a, b));
+# print(mul(a, b));
+a1 = a < b;
+b1 = b < a;
+c1 = a1 && b1;
+
+# print(a1);
+
+# print(b1);
+
+# print(c1);
+
+# print(a1 || c1 && a1);
+
+if a > 30 {
+    print(a);
+};
+

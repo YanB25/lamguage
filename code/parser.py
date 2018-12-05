@@ -74,6 +74,7 @@ class Parser():
         if the next token is op, it is binary, so it works.
         otherwise, return left. nothing happened
         '''
+        # print('left is ', left)
         if (self.is_op()):
             tok = self.tokenizer.peek() # it must be an op
             rhs_prec = Parser.precedence(tok['value'])
@@ -85,6 +86,7 @@ class Parser():
                     'left': left,
                     'right': self.maybe_binary(self.parse_atom(), rhs_prec) # here, it is GREEDY
                 }, prec) # and here, recursive goes back and become same "precedence level"
+            return left # TODO: important!! here
         else:
             # the next token is not op. so just return.
             return left
