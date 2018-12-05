@@ -42,6 +42,8 @@ class Environment():
         else:
             self.vars[name] = value
         return value
+    def __repr__(self):
+        return str(self.vars)
 
 class Interpreter():
     def __init__(self, ast, env):
@@ -71,16 +73,17 @@ class Interpreter():
             arg_lst = []
             for arg in exp['args']:
                 arg_lst.append(self.evaluate(arg, env))
-            func = env.getname(exp['function']['value'])
-            func(*arg_lst)
-            return func
+            func = self.evaluate(exp['function'], env)
+            return func(*arg_lst) #TODO: very important!!
         raise Exception('unknown type {}'.format(typ))
     def make_function(self, exp, env):
-        def func():
+        def func(*myargs):
             names = exp['args']
+            if len(myargs) != len(names):
+                raise Exception('function should be call with {} param. get {}.'.format(len(names), len(myargs)))
             scope = env.extend()
-            for name in names:
-                scope.define(name, env.getname(name))
+            for myarg, name in zip(myargs, names):
+                scope.define(name, myarg)
             return self.evaluate(exp['body'], scope)
         return func
 

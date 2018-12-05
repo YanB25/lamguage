@@ -1,4 +1,8 @@
 a = 3;
-b = true;
-f = function (a) {a};
-print(a);
+b = 9;
+f = function (a) {
+    a;
+    a;
+};
+print(f(a));
+print(f(f(f(a, a))));
