@@ -1,3 +1,4 @@
 {
-    "python.pythonPath": "/Users/yanbin/miniconda3/bin/python"
+    "python.pythonPath": "/Users/yanbin/miniconda3/bin/python",
+    "python.linting.enabled": false
 }

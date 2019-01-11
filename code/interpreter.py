@@ -1,4 +1,6 @@
+import sys
 import math
+import os
 from parser import Parser
 from tokenizer import Tokenizer
 from inputStream import InputStream
@@ -50,6 +52,23 @@ class Interpreter():
     def __init__(self, ast, env):
         self.ast = ast
         self.env = env
+    def load_module(self, mname, basepath='lib/'):
+        '''
+        load in a module with mname.
+        the path of the module would be path.join(basepath, mname + '.lamguage')
+        '''
+        target_path = os.path.join(basepath, '{}.lamguage'.format(mname))
+        f = open(target_path, 'r')
+        s = f.read().strip()
+        parser = Parser(Tokenizer(InputStream(s)))
+        ast = parser.parse()
+        self.evaluate(ast, self.env)
+
+    def __extend(self, ast):
+        '''
+        extend and parse another ast.
+        '''
+        self.ast = ast
     def run(self):
         self.evaluate(self.ast, self.env)
     def evaluate(self, exp, env):
@@ -131,16 +150,22 @@ class Interpreter():
             return (str(lhs != rhs))
         raise Exception('can not recognise op {}'.format(op))
         
-if __name__ == '__main__':
-    import sys
-    filename = sys.argv[1]
-    f = open(filename, 'r')
-    s = f.read().strip()
-    f.close()
 
+
+
+if __name__ == '__main__':
+    f = open(sys.argv[1], 'r')
+    s = f.read().strip()
     parser = Parser(Tokenizer(InputStream(s)))
     env = Environment()
     env.define('__builtin_print', lambda x : print(x, end=''))
     env.define('__builtin_enter', lambda : print())
     interpreter = Interpreter(parser.parse(), env)
+
+    interpreter.load_module('basic')
+    interpreter.load_module('arithmetic')
+    interpreter.load_module('list')
+    interpreter.load_module('maybe')
+    interpreter.load_module('print')
+
     interpreter.run()
