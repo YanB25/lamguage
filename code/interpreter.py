@@ -126,20 +126,21 @@ class Interpreter():
         if (op == '>='):
             return str(int(lhs) >= int(rhs))
         if (op == '=='):
-            return (str(int(lhs) == int(rhs)))
+            return (str(lhs == rhs)) #TODO: do not try to cast to int !
         if (op == '!='):
-            return (str(int(lhs) != int(rhs)))
+            return (str(lhs != rhs))
         raise Exception('can not recognise op {}'.format(op))
         
-
-
 if __name__ == '__main__':
-    f = open('input-hard', 'r')
+    import sys
+    filename = sys.argv[1]
+    f = open(filename, 'r')
     s = f.read().strip()
     f.close()
 
     parser = Parser(Tokenizer(InputStream(s)))
     env = Environment()
-    env.define('print', lambda x : print(x))
+    env.define('__builtin_print', lambda x : print(x, end=''))
+    env.define('__builtin_enter', lambda : print())
     interpreter = Interpreter(parser.parse(), env)
     interpreter.run()

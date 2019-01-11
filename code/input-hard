@@ -18,7 +18,26 @@ gcd = function(a, b) {
     }
 };
 
+add2 = function(i) {
+    i + 2;
+};
+
+double = function(f, val) {
+    f(f(val));
+};
+
+iterate = function(f, times) {
+    if times == 0 {
+        f();
+    } else {
+        iterate(f, times - 1);
+    }
+};
+
 print(f(4));
 print(f(5));
 print(fac(5));
 print(gcd(25, 25));
+print("hello world");
+print(add2(4));
+print(double(add2, 4));
